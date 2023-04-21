@@ -12,18 +12,20 @@ repositories {
     maven {
         url = uri('https://repo.maven.apache.org/maven2/')
     }
+    mavenCentral()
 }
 
 dependencies {
     api 'com.google.guava:guava:18.0'
     api 'ch.qos.logback:logback-classic:1.1.2'
-    testImplementation 'junit:junit:4.11'
+    testImplementation 'org.testifyproject.junit5:junit5:1.0.6'
+    //testImplementation 'junit:junit:4.11'
 }
 
 group = 'org.nhnnext'
 version = '1.0'
 description = 'web-application-server'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 publishing {
     publications {
