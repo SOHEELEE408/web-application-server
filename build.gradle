@@ -44,6 +44,6 @@ tasks.withType(Javadoc) {
 }
 
 task runWebServer(type: JavaExec) {
-    main = 'webserver.WebServer'
+    mainClass = 'webserver.WebServer'
     classpath = sourceSets.main.runtimeClasspath
 }
