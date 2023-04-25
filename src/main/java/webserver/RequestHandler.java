@@ -3,8 +3,11 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
+import data.Uri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static data.Uri.findResponseInfo;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -23,24 +26,12 @@ public class RequestHandler extends Thread {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
             String uri = getUri(in);
+            Uri URI = findResponseInfo(uri);
 
-            byte[] body = null;
-            String contentType = null;
-            FileInputStream responseBodyStream = null;
-            if(uri.contains("/index.html")){
-                responseBodyStream = new FileInputStream("webapp/index.html");
+            FileInputStream responseFile = URI.getPath() != null? new FileInputStream(URI.getPath()) : null;
+            byte[] body = responseFile != null? responseFile.readAllBytes() : "Hello World".getBytes();
 
-                contentType = "text/html";
-            }
-
-            if(uri.contains("/css/styles.css")){
-                responseBodyStream = new FileInputStream("webapp/css/styles.css");
-
-                contentType = "text/css";
-            }
-
-            body = responseBodyStream.readAllBytes();
-            response200Header(dos, body.length, contentType);
+            response200Header(dos, body.length, URI.getContentType());
             responseBody(dos, body);
 
         } catch (IOException e) {
