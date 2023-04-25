@@ -22,12 +22,7 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-
-            InputStreamReader isr = new InputStreamReader(in);
-            BufferedReader br = new BufferedReader(isr);
-            String[] request = br.readLine().split(" ");
-
-            String uri = request[1];
+            String uri = getUri(in);
 
             byte[] body = null;
             String contentType = null;
@@ -71,5 +66,13 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private String getUri(InputStream in) throws IOException {
+        InputStreamReader isr = new InputStreamReader(in);
+        BufferedReader br = new BufferedReader(isr);
+        String[] request = br.readLine().split(" ");
+
+        return request[1];
     }
 }
