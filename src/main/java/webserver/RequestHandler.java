@@ -5,9 +5,9 @@ import java.net.Socket;
 import java.util.Map;
 
 import data.Uri;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HandlerAdapter;
 
 import static data.Uri.findResponseInfo;
 import static util.HttpRequestUtils.*;
@@ -29,8 +29,17 @@ public class RequestHandler extends Thread {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
 
-            String[] splitUri = parseUri(parseInputStream(in));
-            Uri URI = findResponseInfo(splitUri[0]);
+            String[] headerInfo = parseInputStream(in);
+            String[] splitUri = parseUri(headerInfo[1]);
+            Uri URI = findResponseInfo(headerInfo[0], splitUri[0]);
+
+            if(splitUri[1] != null && splitUri[1].contains("&")){
+
+                Map<String, String> request = parseQueryString(splitUri[1]);
+                HandlerAdapter handlerAdapter = new HandlerAdapter(URI);
+                Object response = handlerAdapter.handle(request);
+                log.info(response.toString());
+            }
 
             FileInputStream responseFile = URI.getPath() != null? new FileInputStream(URI.getPath()) : null;
             byte[] body = responseFile != null? responseFile.readAllBytes() : "Hello World".getBytes();
@@ -38,7 +47,7 @@ public class RequestHandler extends Thread {
             response200Header(dos, body.length, URI.getContentType());
             responseBody(dos, body);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
