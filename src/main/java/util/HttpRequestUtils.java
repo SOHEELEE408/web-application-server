@@ -1,5 +1,9 @@
 package util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,6 +12,42 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
+    /**
+     * 도메인을 제외한 URI(QueryString 포함)을 반환한다.
+     *
+     * @param in
+     * @return
+     * @throws IOException
+     */
+    public static String parseInputStream(InputStream in) throws IOException {
+
+        InputStreamReader isr = new InputStreamReader(in);
+        BufferedReader br = new BufferedReader(isr);
+        String[] request = br.readLine().split(" ");
+
+        return request[1];
+    }
+
+    /**
+     * URI와 QueryString을 담은 배열을 반환한다.
+     *
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    public static String[] parseUri(String request) throws IOException {
+        String[] splitUri = new String[2];
+
+        if(request.contains("?")) {
+            splitUri = request.split("\\?");
+            return splitUri;
+        }
+
+        splitUri[0] = request;
+
+        return splitUri;
+    }
+
     /**
      * @param queryString은
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임

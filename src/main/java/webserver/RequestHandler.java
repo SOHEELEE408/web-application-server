@@ -2,12 +2,15 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
 
 import data.Uri;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static data.Uri.findResponseInfo;
+import static util.HttpRequestUtils.*;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -25,8 +28,9 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            String uri = getUri(in);
-            Uri URI = findResponseInfo(uri);
+
+            String[] splitUri = parseUri(parseInputStream(in));
+            Uri URI = findResponseInfo(splitUri[0]);
 
             FileInputStream responseFile = URI.getPath() != null? new FileInputStream(URI.getPath()) : null;
             byte[] body = responseFile != null? responseFile.readAllBytes() : "Hello World".getBytes();
@@ -59,11 +63,5 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private String getUri(InputStream in) throws IOException {
-        InputStreamReader isr = new InputStreamReader(in);
-        BufferedReader br = new BufferedReader(isr);
-        String[] request = br.readLine().split(" ");
 
-        return request[1];
-    }
 }
