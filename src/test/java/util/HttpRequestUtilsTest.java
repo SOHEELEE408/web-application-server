@@ -6,9 +6,38 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import util.HttpRequestUtils.Pair;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class HttpRequestUtilsTest {
+
+    @Test
+    @DisplayName("URI와 QueryString을 분리하여 배열로 반환한다.")
+    void parseUri_with_queryString() throws IOException {
+        // given
+        String uriWithQueryString = "/user/create?userId=guest&password=password&name=Sohee&email=guest@email.com";
+
+        // when
+        String[] request = HttpRequestUtils.parseUri(uriWithQueryString);
+
+        // then
+        assertEquals(true, request[1].contains("&"));
+    }
+
+    @Test
+    @DisplayName("QueryString 없으면 URI만 담은 배열을 반환한다.")
+    void parseUri() throws IOException {
+        // given
+        String uriWithoutQueryString = "/user/create";
+
+        // when
+        String[] request = HttpRequestUtils.parseUri(uriWithoutQueryString);
+
+        // then
+        assertEquals(request[0], uriWithoutQueryString);
+        assertEquals(request[1], null);
+    }
+
     @Test
     public void parseQueryString() {
         String queryString = "userId=javajigi";
