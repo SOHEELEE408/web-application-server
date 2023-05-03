@@ -11,7 +11,7 @@ public enum Uri {
     JQUERY("/js/jquery-2.2.0.min.js", "webapp/js/jquery-2.2.0.min.js", "text/javascript"),
     SCRIPT("/js/scripts.js", "webapp/js/scripts.js", "text/javascript"),
     FAVICON("/favicon.ico", "webapp/favicon.ico", "image/x-icon"),
-
+    FORM("/user/form.html","webapp/user/form.html", "text/html"),
     DEFAULT("/", null, "text/html")
     ;
 
