@@ -12,24 +12,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
-    /**
-     * 도메인을 제외한 URI(QueryString 포함)을 반환한다.
-     *
-     * @param in
-     * @return
-     * @throws IOException
-     */
-    public static String parseInputStream(InputStream in) throws IOException {
-
-        InputStreamReader isr = new InputStreamReader(in);
-        BufferedReader br = new BufferedReader(isr);
-        String[] request = br.readLine().split(" ");
-
-        return request[1];
-    }
 
     /**
-     * URI와 QueryString을 담은 배열을 반환한다.
+     * URI, QueryString을 배열로 반환한다.
      *
      * @param request
      * @return

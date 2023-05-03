@@ -72,5 +72,20 @@ public class RequestHandler extends Thread {
         }
     }
 
+    /**
+     * method, uri, HTTP version을 배열로 반환한다.
+     *
+     * @param in
+     * @return
+     * @throws IOException
+     */
+    private String[] parseInputStream(InputStream in) throws IOException {
+
+        InputStreamReader isr = new InputStreamReader(in);
+        BufferedReader br = new BufferedReader(isr);
+        String[] request = br.readLine().split(" ");
+
+        return request;
+    }
 
 }
