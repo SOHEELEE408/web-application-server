@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import util.IOUtils;
 
 import static data.Uri.*;
+import static db.DataBase.*;
 import static util.HttpRequestUtils.*;
 
 public class RequestHandler extends Thread {
@@ -36,6 +37,8 @@ public class RequestHandler extends Thread {
             String[] splitUri = parseUri(headerInfo[1]);
             Uri URI = findResponseInfo(headerInfo[0], splitUri[0]);
 
+            int contentLength = 0;
+
             if(URI == JOIN){
 
                 Map<String, String> request = parseQueryString(splitUri[1]);
@@ -46,7 +49,6 @@ public class RequestHandler extends Thread {
 
             if(URI == JOIN_POST) {
 
-                int contentLength = 0;
                 boolean next = true;
                 while (next){
                     String current = br.readLine();
@@ -60,6 +62,7 @@ public class RequestHandler extends Thread {
 
                 Map<String, String> request = parseQueryString(IOUtils.readData(br, contentLength));
                 User user = new User(request.get("userId"), request.get("password"), request.get("name"), request.get("email"));
+                addUser(user);
 
                 log.info(user.toString());
 
