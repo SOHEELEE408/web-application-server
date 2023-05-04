@@ -67,7 +67,7 @@ public class RequestHandler extends Thread {
                 log.info(user.toString());
 
                 response302Header(dos, "http://localhost:8080/index.html");
-                responseBody(dos, null);
+                dos.flush();
 
                 return;
             }
