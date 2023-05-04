@@ -28,8 +28,10 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
+            InputStreamReader isr = new InputStreamReader(in);
+            BufferedReader br = new BufferedReader(isr);
 
-            String[] headerInfo = parseInputStream(in);
+            String[] headerInfo = br.readLine().split(" ");
             String[] splitUri = parseUri(headerInfo[1]);
             Uri URI = findResponseInfo(headerInfo[0], splitUri[0]);
 
@@ -70,22 +72,6 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-    }
-
-    /**
-     * method, uri, HTTP version을 배열로 반환한다.
-     *
-     * @param in
-     * @return
-     * @throws IOException
-     */
-    private String[] parseInputStream(InputStream in) throws IOException {
-
-        InputStreamReader isr = new InputStreamReader(in);
-        BufferedReader br = new BufferedReader(isr);
-        String[] request = br.readLine().split(" ");
-
-        return request;
     }
 
 }
