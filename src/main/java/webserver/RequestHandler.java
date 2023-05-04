@@ -25,24 +25,18 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            String uri = getUri(in);
-            Uri URI = findResponseInfo(uri);
-
-            FileInputStream responseFile = URI.getPath() != null? new FileInputStream(URI.getPath()) : null;
-            byte[] body = responseFile != null? responseFile.readAllBytes() : "Hello World".getBytes();
-
-            response200Header(dos, body.length, URI.getContentType());
+            byte[] body = "Hello World".getBytes();
+            response200Header(dos, body.length);
             responseBody(dos, body);
-
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: "+contentType+";charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -57,13 +51,5 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-    }
-
-    private String getUri(InputStream in) throws IOException {
-        InputStreamReader isr = new InputStreamReader(in);
-        BufferedReader br = new BufferedReader(isr);
-        String[] request = br.readLine().split(" ");
-
-        return request[1];
     }
 }
