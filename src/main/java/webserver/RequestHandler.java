@@ -126,7 +126,7 @@ public class RequestHandler extends Thread {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: "+redirectUrl+"\r\n");
 
-            if(cookieName != null) dos.writeBytes("Set-Cookie: "+ cookieName + "="+ cookieValue+"\r\n");
+            if(cookieName != null) dos.writeBytes("Set-Cookie: "+ cookieName + "="+ cookieValue+"; Domain: localhost:8080; Path: /"+"\r\n");
 
             dos.writeBytes("\r\n");
         } catch (IOException e) {
