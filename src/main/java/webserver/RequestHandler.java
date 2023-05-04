@@ -5,10 +5,11 @@ import java.net.Socket;
 import java.util.Map;
 
 import data.Uri;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.HandlerAdapter;
 
+import static data.Uri.JOIN;
 import static data.Uri.findResponseInfo;
 import static util.HttpRequestUtils.*;
 
@@ -35,12 +36,12 @@ public class RequestHandler extends Thread {
             String[] splitUri = parseUri(headerInfo[1]);
             Uri URI = findResponseInfo(headerInfo[0], splitUri[0]);
 
-            if(splitUri[1] != null && splitUri[1].contains("&")){
+            if(URI == JOIN){
 
                 Map<String, String> request = parseQueryString(splitUri[1]);
-                HandlerAdapter handlerAdapter = new HandlerAdapter(URI);
-                Object response = handlerAdapter.handle(request);
-                log.info(response.toString());
+                User user = new User(request.get("userId"), request.get("password"), request.get("name"), request.get("email"));
+
+                log.info(user.toString());
             }
 
             FileInputStream responseFile = URI.getPath() != null? new FileInputStream(URI.getPath()) : null;
