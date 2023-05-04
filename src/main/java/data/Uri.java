@@ -20,6 +20,8 @@ public enum Uri {
     LOGIN("POST", "/user/login", null, "text/html"),
     LOGIN_FAILED("GET", "/user/login_failed.html", "webapp/user/login_failed.html", "text/html"),
 
+    USER_LIST("GET", "/user/list", "webapp/user/list.html", "text/html"),
+
     DEFAULT("GET","/", null, "text/html"),
     ;
 

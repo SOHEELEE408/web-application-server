@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Map;
 
 import data.Uri;
@@ -96,6 +97,39 @@ public class RequestHandler extends Thread {
                 }
 
                 response302Header(dos, HOST+INDEX.getUri(), "logined", "true");
+                dos.flush();
+                return;
+            }
+
+            if(URI == USER_LIST){
+
+                Map<String, String> request = new HashMap<>();
+                boolean next = true;
+
+                while (next){
+                    String current = br.readLine();
+                    if(current.contains("Content-Length")){
+                        String[] tmps = current.split(" ");
+                        contentLength = Integer.parseInt(tmps[1]);
+                    }
+
+                    if(current.contains("Cookie")) {
+                        String[] tmps = current.split(" ");
+                        request = parseCookies(tmps[1]);
+                        next = false;
+                    }
+
+                    if(current == null || current.equals(""))
+                        next = false;
+                }
+
+                if(request.get("logined").equals("true")){
+                    response302Header(dos, HOST+USER_LIST.getUri(), null, null);
+                    dos.flush();
+                    return;
+                }
+
+                response302Header(dos, HOST+LOGIN_PAGE.getUri(), null, null);
                 dos.flush();
                 return;
             }
