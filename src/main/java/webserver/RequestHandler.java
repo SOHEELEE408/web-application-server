@@ -8,9 +8,9 @@ import data.Uri;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.IOUtils;
 
-import static data.Uri.JOIN;
-import static data.Uri.findResponseInfo;
+import static data.Uri.*;
 import static util.HttpRequestUtils.*;
 
 public class RequestHandler extends Thread {
@@ -43,6 +43,27 @@ public class RequestHandler extends Thread {
 
                 log.info(user.toString());
             }
+
+            if(URI == JOIN_POST) {
+
+                int contentLength = 0;
+                boolean next = true;
+                while (next){
+                    String current = br.readLine();
+                    if(current.contains("Content-Length")){
+                        String[] tmps = current.split(" ");
+                        contentLength = Integer.parseInt(tmps[1]);
+                    }
+                    if(current == null || current.equals(""))
+                        next = false;
+                }
+
+                Map<String, String> request = parseQueryString(IOUtils.readData(br, contentLength));
+                User user = new User(request.get("userId"), request.get("password"), request.get("name"), request.get("email"));
+
+                log.info(user.toString());
+            }
+
 
             FileInputStream responseFile = URI.getPath() != null? new FileInputStream(URI.getPath()) : null;
             byte[] body = responseFile != null? responseFile.readAllBytes() : "Hello World".getBytes();
