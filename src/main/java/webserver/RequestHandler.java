@@ -62,8 +62,12 @@ public class RequestHandler extends Thread {
                 User user = new User(request.get("userId"), request.get("password"), request.get("name"), request.get("email"));
 
                 log.info(user.toString());
-            }
 
+                response302Header(dos, "http://localhost:8080/index.html");
+                responseBody(dos, null);
+
+                return;
+            }
 
             FileInputStream responseFile = URI.getPath() != null? new FileInputStream(URI.getPath()) : null;
             byte[] body = responseFile != null? responseFile.readAllBytes() : "Hello World".getBytes();
@@ -81,6 +85,16 @@ public class RequestHandler extends Thread {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: "+contentType+";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String redirectUrl){
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: "+redirectUrl+"\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
