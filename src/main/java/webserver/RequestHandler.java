@@ -18,6 +18,7 @@ public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
+    public static final String HOST = "http://localhost:8080";
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -66,7 +67,7 @@ public class RequestHandler extends Thread {
 
                 log.info(user.toString());
 
-                response302Header(dos, "http://localhost:8080/index.html", null, null);
+                response302Header(dos, HOST+INDEX.getUri(), null, null);
                 dos.flush();
 
                 return;
@@ -89,12 +90,12 @@ public class RequestHandler extends Thread {
                 User user = findUserById(request.get("userId"));
 
                 if(user == null || !user.getPassword().equals(request.get("password"))) {
-                    response302Header(dos, "http://localhost:8080/user/login_failed.html", "logined", "false");
+                    response302Header(dos, HOST+LOGIN_FAILED.getUri(), "logined", "false");
                     dos.flush();
                     return;
                 }
 
-                response302Header(dos, "http://localhost:8080/index.html", "logined", "true");
+                response302Header(dos, HOST+INDEX.getUri(), "logined", "true");
                 dos.flush();
                 return;
             }
