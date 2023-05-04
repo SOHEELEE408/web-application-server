@@ -15,6 +15,11 @@ public enum Uri {
 
     JOIN("GET","/user/create", null, "text/html"),
     JOIN_POST("POST","/user/create", null, "text/html"),
+
+    LOGIN_PAGE("GET", "/user/login.html", "webapp/user/login.html", "text/html"),
+    LOGIN("POST", "/user/login", null, "text/html"),
+    LOGIN_FAILED("GET", "/user/login_failed.html", "webapp/user/login_failed.html", "text/html"),
+
     DEFAULT("GET","/", null, "text/html"),
     ;
 
