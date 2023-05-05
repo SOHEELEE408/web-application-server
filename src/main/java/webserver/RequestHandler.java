@@ -2,8 +2,11 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import data.Uri;
 import model.User;
@@ -32,7 +35,7 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            InputStreamReader isr = new InputStreamReader(in);
+            InputStreamReader isr = new InputStreamReader(in, "UTF-8");
             BufferedReader br = new BufferedReader(isr);
 
             String[] headerInfo = br.readLine().split(" ");
@@ -124,14 +127,38 @@ public class RequestHandler extends Thread {
                 }
 
                 if(Boolean.parseBoolean(request.get("logined")) == true){
-                    response302Header(dos, HOST+USER_LIST.getUri(), null, null);
-                    dos.flush();
+                    Collection<User> users = findAll();
+
+                    FileReader responsePage = new FileReader(URI.getPath());
+                    BufferedReader pageReader = new BufferedReader(responsePage);
+                    StringBuilder sb = new StringBuilder();
+
+                    while(pageReader.ready()){
+                        String tmp = pageReader.readLine();
+                        sb.append(tmp);
+
+                        if(tmp.contains("<tbody>")){
+                            AtomicInteger row = new AtomicInteger();
+                            users.forEach(user -> {
+                                sb.append("<tr>\n" + "<th scope=\"row\">"+(row.incrementAndGet())+"</th> <td>"
+                                        +user.getUserId()+"</td> <td>"
+                                        +user.getName()+"</td> <td>"
+                                        +user.getEmail()+"</td><td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>\n"
+                                        +"</tr>\n");
+                            });
+                        }
+                    }
+
+                    response200Header(dos, sb.length(), URI.getContentType());
+                    responseBody(dos, sb.toString().getBytes());
                     return;
                 }
 
-                response302Header(dos, HOST+LOGIN_PAGE.getUri(), null, null);
-                dos.flush();
-                return;
+                if(request == null || Boolean.parseBoolean(request.get("logined")) == false) {
+                    response302Header(dos, HOST + LOGIN_PAGE.getUri(), null, null);
+                    dos.flush();
+                    return;
+                }
             }
 
             FileInputStream responseFile = URI.getPath() != null? new FileInputStream(URI.getPath()) : null;
