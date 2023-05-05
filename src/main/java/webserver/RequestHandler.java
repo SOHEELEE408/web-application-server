@@ -123,7 +123,7 @@ public class RequestHandler extends Thread {
                         next = false;
                 }
 
-                if(request.get("logined").equals("true")){
+                if(Boolean.parseBoolean(request.get("logined")) == true){
                     response302Header(dos, HOST+USER_LIST.getUri(), null, null);
                     dos.flush();
                     return;
