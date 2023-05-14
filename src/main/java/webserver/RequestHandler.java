@@ -3,6 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -35,19 +36,25 @@ public class RequestHandler extends Thread {
             String line = br.readLine();
             log.debug("request line: {}", line);
 
-            if(line == null) return;
+            if (line == null) return;
 
             String[] tokens = line.split(" ");
             int contentLength = 0;
-            while(!line.equals("")) {
+            boolean logined = false;
+
+            while (!line.equals("")) {
                 log.debug("header : {}", line);
                 line = br.readLine();
+
                 if (line.contains("Content-Length"))
                     contentLength = getContentLength(line);
+
+                if (!line.contains("Cookie"))
+                    logined = isLogin(line);
             }
 
             String url = tokens[1];
-            if("/user/create".equals(url)){
+            if ("/user/create".equals(url)) {
                 String body = IOUtils.readData(br, contentLength);
                 Map<String, String> params = HttpRequestUtils.parseQueryString(body);
 
@@ -57,30 +64,63 @@ public class RequestHandler extends Thread {
                 DataOutputStream dos = new DataOutputStream(out);
                 response302Header(dos, "/index.html");
 
-            } else if("/user/login".equals(url)) {
+            } else if ("/user/login".equals(url)) {
                 String body = IOUtils.readData(br, contentLength);
                 Map<String, String> params = HttpRequestUtils.parseQueryString(body);
                 User user = DataBase.findUserById(params.get("userId"));
 
-                if(user == null){
+                if (user == null) {
                     responseResource(out, "/user/login_failed.html");
                     return;
                 }
 
-                if(user.getPassword().equals(params.get("password"))) {
+                if (user.getPassword().equals(params.get("password"))) {
                     DataOutputStream dos = new DataOutputStream(out);
                     response302LoginSuccessHeader(dos);
                 } else {
                     responseResource(out, "/user/login_failed.html");
                 }
 
-            } else {
+            } else if("/user/list".equals(url)) {
+                if(!logined) {
+                    responseResource(out, "/user/login.html");
+                    return;
+                }
+
+                Collection<User> users = DataBase.findAll();
+                StringBuilder sb = new StringBuilder();
+                sb.append("<table border = '1'>");
+                for (User user : users){
+                    sb.append("<tr>");
+                    sb.append("<td>"+ user.getUserId()+"/<td>");
+                    sb.append("<td>"+ user.getName()+"/<td>");
+                    sb.append("<td>"+ user.getEmail()+"/<td>");
+                    sb.append("</tr>");
+                }
+                sb.append("</table>");
+                byte[] body = sb.toString().getBytes();
+                DataOutputStream dos = new DataOutputStream(out);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+
+            }else {
                 responseResource(out, url);
             }
 
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private boolean isLogin(String line){
+        String[] headerTokens = line.split(":");
+        Map<String, String> cookies = HttpRequestUtils.parseCookies(headerTokens[1].trim());
+        String value = cookies.get("logined");
+
+        if(value == null)
+            return false;
+
+        return Boolean.parseBoolean(value);
     }
 
     private int getContentLength(String line){
