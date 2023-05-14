@@ -43,7 +43,7 @@ public class RequestHandler extends Thread {
                         request.getParams().get("name"), request.getParams().get("email"));
                 DataBase.addUser(user);
 
-                response302Header(dos, "/index.html");
+                response302Header(dos, null,"/index.html");
 
             } else if(request.getUrl().endsWith(".css")) {
                 byte[] body = Files.readAllBytes(new File("./webapp" + request.getUrl()).toPath());
@@ -59,7 +59,7 @@ public class RequestHandler extends Thread {
                 }
 
                 if (user.getPassword().equals(request.getParams().get("password"))) {
-                    response302LoginSuccessHeader(dos);
+                    response302Header(dos, "logined=true", "/index.html");
                 } else {
                     responseResource(out, "/user/login_failed.html");
                 }
@@ -118,20 +118,10 @@ public class RequestHandler extends Thread {
         responseBody(dos, body);
     }
 
-    private void response302LoginSuccessHeader(DataOutputStream dos){
+    private void response302Header(DataOutputStream dos, String cookie, String url){
         try{
             dos.writeBytes("HTTP/1.1 302 Redirect \r\n");
-            dos.writeBytes("Set-Cookie: logined=true \r\n");
-            dos.writeBytes("Location: /index.html \r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void response302Header(DataOutputStream dos, String url){
-        try{
-            dos.writeBytes("HTTP/1.1 302 Redirect \r\n");
+            if(cookie != null) dos.writeBytes("Set-Cookie: "+ cookie+" \r\n");
             dos.writeBytes("Location: "+url+" \r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
