@@ -32,6 +32,8 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+            DataOutputStream dos = new DataOutputStream(out);
+
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
             log.debug("request line: {}", line);
@@ -61,11 +63,9 @@ public class RequestHandler extends Thread {
                 User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
                 DataBase.addUser(user);
 
-                DataOutputStream dos = new DataOutputStream(out);
                 response302Header(dos, "/index.html");
 
             } else if(url.endsWith(".css")) {
-                DataOutputStream dos = new DataOutputStream(out);
                 byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
                 response200CssHeader(dos, body.length);
                 responseBody(dos, body);
@@ -81,7 +81,6 @@ public class RequestHandler extends Thread {
                 }
 
                 if (user.getPassword().equals(params.get("password"))) {
-                    DataOutputStream dos = new DataOutputStream(out);
                     response302LoginSuccessHeader(dos);
                 } else {
                     responseResource(out, "/user/login_failed.html");
@@ -105,7 +104,6 @@ public class RequestHandler extends Thread {
                 }
                 sb.append("</table>");
                 byte[] body = sb.toString().getBytes();
-                DataOutputStream dos = new DataOutputStream(out);
                 response200Header(dos, body.length);
                 responseBody(dos, body);
 
