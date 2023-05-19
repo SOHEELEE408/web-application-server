@@ -4,19 +4,15 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 
 import data.HttpRequest;
-import data.Uri;
 import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
-import util.IOUtils;
 
-import static data.Uri.findResponseInfo;
 
 public class RequestHandler extends Thread {
     public static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -34,38 +30,37 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            HttpRequest request = new HttpRequest(br);
+            HttpRequest request = new HttpRequest(in);
 
-            if ("/user/create".equals(request.getUrl())) {
+            if ("/user/create".equals(request.getPath())) {
 
-                User user = new User(request.getParams().get("userId"), request.getParams().get("password"),
-                        request.getParams().get("name"), request.getParams().get("email"));
+                User user = new User(request.getParameter("userId"), request.getParameter("password"),
+                        request.getParameter("name"), request.getParameter("email"));
                 DataBase.addUser(user);
 
                 response302Header(dos, null,"/index.html");
 
-            } else if(request.getUrl().endsWith(".css")) {
-                byte[] body = Files.readAllBytes(new File("./webapp" + request.getUrl()).toPath());
+            } else if(request.getPath().endsWith(".css")) {
+                byte[] body = Files.readAllBytes(new File("./webapp" + request.getPath()).toPath());
                 response200Header(dos, "text/css", body.length);
                 responseBody(dos, body);
 
-            } else if ("/user/login".equals(request.getUrl())) {
-                User user = DataBase.findUserById(request.getParams().get("userId"));
+            } else if ("/user/login".equals(request.getPath())) {
+                User user = DataBase.findUserById(request.getParameter("userId"));
 
                 if (user == null) {
                     responseResource(out, "/user/login_failed.html");
                     return;
                 }
 
-                if (user.getPassword().equals(request.getParams().get("password"))) {
+                if (user.getPassword().equals(request.getParameter("password"))) {
                     response302Header(dos, "logined=true", "/index.html");
                 } else {
                     responseResource(out, "/user/login_failed.html");
                 }
 
-            } else if("/user/list".equals(request.getUrl())) {
-                if(!request.isLogined()) {
+            } else if("/user/list".equals(request.getPath())) {
+                if(!Boolean.parseBoolean(request.getCookies("logined"))) {
                     responseResource(out, "/user/login.html");
                     return;
                 }
@@ -86,7 +81,7 @@ public class RequestHandler extends Thread {
                 responseBody(dos, body);
 
             }else {
-                responseResource(out, request.getUrl());
+                responseResource(out, request.getPath());
             }
 
         } catch (IOException e) {
