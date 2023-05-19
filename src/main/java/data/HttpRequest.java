@@ -46,30 +46,29 @@ public class HttpRequest {
             String[] tokens = line.split(" ");
             method = tokens[0];
 
-            while (line != null) {
+            while (line != null && !line.equals("")) {
 
-                line = br.readLine();
-                if(line == null) break;
+                if(line == null || line.equals("")) break;
 
-                log.debug("header : {}", line);
-                String[] headers = line.split(":");
+                String[] headers = line.split(" ");
+                headers[0] = headers[0].replace(":","");
 
                 header.put(headers[0], headers[1].trim());
             }
 
             String body = null;
-            if(method.equals("GET")){
+            if(tokens[1].contains("\\?")){
                 String[] paths = tokens[1].split("\\?");
                 path = paths[0];
 
                 body = paths[1];
-            }
 
-            if(method.equals("POST")){
+            } else {
                 path = tokens[1];
-
-                body = IOUtils.readData(br, Integer.parseInt(header.get("Content-Length")));
             }
+
+            if(method.equals("POST"))
+                body = IOUtils.readData(br, Integer.parseInt(header.get("Content-Length")));
 
             parameter = HttpRequestUtils.parseQueryString(body);
 
