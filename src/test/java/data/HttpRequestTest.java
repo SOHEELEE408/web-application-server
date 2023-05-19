@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,9 +22,9 @@ class HttpRequestTest {
 
         // when
         assertEquals("GET", request.getMethod());
-        assertEquals("/user/create", request.getUrl());
+        assertEquals("/user/create", request.getPath());
         assertEquals("keep-alive", request.getHeader("Connection"));
-        assertEquals("javajigi", request.getParammeter("userId"));
+        assertEquals("javajigi", request.getParameter("userId"));
 
         // then
 
@@ -40,9 +39,9 @@ class HttpRequestTest {
 
         // when
         assertEquals("POST", request.getMethod());
-        assertEquals("/user/create", request.getUrl());
+        assertEquals("/user/create", request.getPath());
         assertEquals("keep-alive", request.getHeader("Connection"));
-        assertEquals("javajigi", request.getParammeter("userId"));
+        assertEquals("javajigi", request.getParameter("userId"));
 
         // then
     }
