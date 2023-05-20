@@ -50,6 +50,7 @@ public class HttpRequest {
             method = tokens[0];
 
             while (line != null && !line.equals("")) {
+                line = br.readLine();
 
                 if(line == null || line.equals("")) break;
 
