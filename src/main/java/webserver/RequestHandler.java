@@ -60,7 +60,9 @@ public class RequestHandler extends Thread {
                 }
 
             } else if("/user/list".equals(request.getPath())) {
-                if(!Boolean.parseBoolean(request.getCookies("logined"))) {
+                Map<String, String> cookies = HttpRequestUtils.parseCookies(request.getHeader("Cookie"));
+
+                if(!Boolean.parseBoolean(cookies.get("logined"))) {
                     responseResource(out, "/user/login.html");
                     return;
                 }

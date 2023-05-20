@@ -1,5 +1,7 @@
 package data;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 import util.IOUtils;
 
@@ -10,15 +12,14 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import static webserver.RequestHandler.*;
 
 public class HttpRequest {
+    private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
 
-    private Map<String, String> header = new HashMap<>();
     private String method;
     private String path;
     private Map<String, String> parameter = new HashMap<>();
-    private Map<String, String> cookies = new HashMap<>();
+    private Map<String, String> header = new HashMap<>();
 
 
     public String getHeader(String key){
@@ -37,8 +38,6 @@ public class HttpRequest {
         return parameter.get(key);
     }
 
-    public String getCookies(String key){ return cookies.get(key); }
-
     public HttpRequest(InputStream in){
 
         try{
@@ -46,43 +45,46 @@ public class HttpRequest {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
             String line = br.readLine();
-            String[] tokens = line.split(" ");
-            method = tokens[0];
+            if(line == null) return;
 
+            processRequestLine(line);
+
+            line = br.readLine(); // 요청 라인과 header 사이의 공백
             while (line != null && !line.equals("")) {
+                log.debug("header: {}", line);
 
-                if(line == null || line.equals("")) break;
-
-                String[] headers = line.split(" ");
-                headers[0] = headers[0].replace(":","");
-
-                if(headers[0].equals("Cookie"))
-                    cookies = HttpRequestUtils.parseCookies(headers[1].trim());
-
-                 else
-                     header.put(headers[0], headers[1].trim());
+                String[] tokens = line.split(":");
+                header.put(tokens[0].trim(), tokens[1].trim());
+                line = br.readLine();
             }
 
-            String body = null;
-            if(tokens[1].contains("\\?")){
-                String[] paths = tokens[1].split("\\?");
-                path = paths[0];
-
-                body = paths[1];
-
-            } else {
-                path = tokens[1];
+            if("POST".equals(method)){
+                String body = IOUtils.readData(br, Integer.parseInt(header.get("Content-Length")));
+                parameter = HttpRequestUtils.parseQueryString(body);
             }
-
-            if(method.equals("POST"))
-                body = IOUtils.readData(br, Integer.parseInt(header.get("Content-Length")));
-
-            parameter = HttpRequestUtils.parseQueryString(body);
 
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
 
+    private void processRequestLine(String requestLine) {
+        log.debug("request line: {}", requestLine);
+
+        String[] tokens = requestLine.split(" ");
+        method = tokens[0];
+
+        if ("POST".equals(method)){
+            path = tokens[1];
+            return;
+        }
+
+        int index = tokens[1].indexOf("?");
+        if(index == -1) path = tokens[1];
+        else {
+            path = tokens[1].substring(0, index);
+            parameter = HttpRequestUtils.parseQueryString(tokens[1].substring(index+1));
+        }
 
     }
 }
