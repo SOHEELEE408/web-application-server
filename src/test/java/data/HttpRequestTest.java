@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HttpRequestTest {
 
-    private String testDirectory = "./src/test.resources/";
+    private String testDirectory = "./src/test/resources/";
 
     @Test
     @DisplayName("")
