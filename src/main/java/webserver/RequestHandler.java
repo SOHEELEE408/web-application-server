@@ -57,7 +57,7 @@ public class RequestHandler extends Thread {
 
             } else if("/user/list".equals(path)) {
 
-                if(!isLogin(request.getHeader("Cookie"))) {
+                if(!request.isLogin()) {
                     responseResource(out, "/user/login.html");
                     return;
                 }
@@ -84,16 +84,6 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-    }
-
-    public static boolean isLogin(String cookieValue){
-        Map<String, String> cookies = HttpRequestUtils.parseCookies(cookieValue);
-        String value = cookies.get("logined");
-
-        if(value == null)
-            return false;
-
-        return Boolean.parseBoolean(value);
     }
 
     private String getDefaultPath(String path){

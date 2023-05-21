@@ -20,6 +20,7 @@ public class HttpRequest {
     private RequestLine requestLine;
     private Map<String, String> parameter = new HashMap<>();
     private Map<String, String> header = new HashMap<>();
+    private Map<String, String> cookie = new HashMap<>();
 
 
     public String getHeader(String key){
@@ -54,7 +55,11 @@ public class HttpRequest {
                 log.debug("header: {}", line);
 
                 String[] tokens = line.split(":");
-                header.put(tokens[0].trim(), tokens[1].trim());
+
+                if(tokens[0].trim().equals("Cookie"))
+                    cookie = HttpRequestUtils.parseCookies(tokens[1].trim());
+                else
+                    header.put(tokens[0].trim(), tokens[1].trim());
                 line = br.readLine();
             }
 
@@ -67,5 +72,14 @@ public class HttpRequest {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    public boolean isLogin(){
+        String value = cookie.get("logined");
+
+        if(value == null)
+            return false;
+
+        return Boolean.parseBoolean(value);
     }
 }
