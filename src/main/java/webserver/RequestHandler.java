@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import data.HttpRequest;
-import data.HttpResponse;
 import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
@@ -31,9 +30,10 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest request = new HttpRequest(in);
+            String path = getDefaultPath(request.getPath());
             HttpResponse response = new HttpResponse(out);
 
-            if ("/user/create".equals(request.getPath())) {
+            if ("/user/create".equals(path)) {
 
                 User user = new User(request.getParameter("userId"), request.getParameter("password"),
                         request.getParameter("name"), request.getParameter("email"));
@@ -58,8 +58,9 @@ public class RequestHandler extends Thread {
                     response.forward("/user/login_failed.html");
                 }
 
-            } else if("/user/list".equals(request.getPath())) {
-                if(!Boolean.parseBoolean(request.getCookies("logined"))) {
+            } else if("/user/list".equals(path)) {
+
+                if(!request.isLogin()) {
                     response.forward("/user/login.html");
                     return;
                 }
@@ -85,5 +86,12 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private String getDefaultPath(String path){
+        if(path.equals("/"))
+            return "/index.html";
+
+        return path;
     }
 }
