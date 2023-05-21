@@ -3,7 +3,8 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
-import config.WebConfiguration;
+import config.RequestMapping;
+import controller.Controller;
 import data.HttpRequest;
 import data.HttpResponse;
 import org.slf4j.Logger;
@@ -26,13 +27,15 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest request = new HttpRequest(in);
-            String path = getDefaultPath(request.getPath());
             HttpResponse response = new HttpResponse(out);
 
-            if(request.getPath().contains("."))
-                WebConfiguration.controller().get("static").service(request, response);
-            else
-                WebConfiguration.controller().get(request.getPath()).service(request, response);
+            Controller controller = RequestMapping.getController(request.getPath());
+
+            if(controller == null) {
+                String path = getDefaultPath(request.getPath());
+                response.forward(path);
+            } else
+               controller.service(request, response);
 
         } catch (IOException e) {
             log.error(e.getMessage());
