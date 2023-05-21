@@ -31,13 +31,13 @@ public class HttpResponse {
             addHeader("statusCode", "HTTP/1.1 200 OK");
 
             if(path.contains(".html"))
-                addHeader("Content-Type", "text/"+path.substring(path.indexOf(".")+1)+";charset=utf-8");
+                addHeader("Content-Type", "text/"+path.substring(path.lastIndexOf(".")+1)+";charset=utf-8");
 
             else if (path.contains(".js"))
                 addHeader("Content-Type", "text/javascript");
 
             else
-                addHeader("Content-Type", "text/"+path.substring(path.indexOf(".")+1));
+                addHeader("Content-Type", "text/"+path.substring(path.lastIndexOf(".")+1));
 
             addHeader("Content-Length", String.valueOf(body.length));
 

@@ -2,16 +2,14 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
 import java.util.Collection;
-import java.util.Map;
 
 import data.HttpRequest;
+import data.HttpResponse;
 import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.HttpRequestUtils;
 
 
 public class RequestHandler extends Thread {
