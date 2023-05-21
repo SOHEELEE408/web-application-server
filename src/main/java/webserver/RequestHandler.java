@@ -42,18 +42,17 @@ public class RequestHandler extends Thread {
             } else if ("/user/login".equals(request.getPath())) {
                 User user = DataBase.findUserById(request.getParameter("userId"));
 
-                if (user == null) {
-                    response.forward("/user/login_failed.html");
-                    return;
-                }
+                if (user != null) {
+                    if (user.getPassword().equals(request.getParameter("password"))) {
 
-                if (user.getPassword().equals(request.getParameter("password"))) {
+                        response.addHeader("Set-Cookie", "logined=true");
+                        response.sendRedirect("/index.html");
 
-                    response.addHeader("Set-Cookie", "logined=true");
-                    response.sendRedirect("/index.html");
-
+                    } else {
+                        response.forward("/user/login_failed.html");
+                    }
                 } else {
-                    response.forward("/user/login_failed.html");
+                    response.sendRedirect("/user/login_failed.html");
                 }
 
             } else if("/user/list".equals(path)) {
@@ -74,8 +73,7 @@ public class RequestHandler extends Thread {
                     sb.append("</tr>");
                 }
                 sb.append("</table>");
-                response.setBody(null, sb.toString().getBytes());
-                response.forward("/user/list.html");
+                response.forwardBody(sb.toString());
 
             } else {
                 response.forward(request.getPath());
