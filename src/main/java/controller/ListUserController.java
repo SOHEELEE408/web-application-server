@@ -19,7 +19,7 @@ public class ListUserController extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) throws IOException {
 
-        if(!isLogin(request.getCookies("logined"))) {
+        if(!request.isLogin()) {
             response.forward("/user/login.html");
             return;
         }
@@ -35,13 +35,7 @@ public class ListUserController extends AbstractController {
             sb.append("</tr>");
         }
         sb.append("</table>");
-        response.setBody(null, sb.toString().getBytes());
-        response.forward("/user/list.html");
+        response.forwardBody(sb.toString());
 
-    }
-
-    public boolean isLogin(String logined){
-
-        return Boolean.parseBoolean(logined);
     }
 }
