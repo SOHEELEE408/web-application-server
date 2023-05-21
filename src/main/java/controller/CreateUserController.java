@@ -8,12 +8,6 @@ import model.User;
 public class CreateUserController extends AbstractController {
 
     @Override
-    public void service(HttpRequest request, HttpResponse response){
-
-        doPost(request, response);
-    }
-
-    @Override
     public void doPost(HttpRequest request, HttpResponse response){
 
         User user = new User(request.getParameter("userId"), request.getParameter("password"),

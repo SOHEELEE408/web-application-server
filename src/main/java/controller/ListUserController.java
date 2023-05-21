@@ -11,12 +11,6 @@ import java.util.Collection;
 public class ListUserController extends AbstractController {
 
     @Override
-    public void service(HttpRequest request, HttpResponse response) throws IOException {
-
-        doGet(request, response);
-    }
-
-    @Override
     public void doGet(HttpRequest request, HttpResponse response) throws IOException {
 
         if(!request.isLogin()) {
