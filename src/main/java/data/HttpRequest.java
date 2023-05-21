@@ -26,7 +26,7 @@ public class HttpRequest {
         return header.get(key);
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return requestLine.getMethod();
     }
 
@@ -58,7 +58,7 @@ public class HttpRequest {
                 line = br.readLine();
             }
 
-            if("POST".equals(getMethod())){
+            if(getMethod().isPost()){
                 String body = IOUtils.readData(br, Integer.parseInt(header.get("Content-Length")));
                 parameter = HttpRequestUtils.parseQueryString(body);
             } else
