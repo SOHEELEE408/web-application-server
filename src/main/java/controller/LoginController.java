@@ -26,24 +26,9 @@ public class LoginController extends AbstractController {
 
         if (user.getPassword().equals(request.getParameter("password"))) {
 
-            HttpSession session = new HttpSession(String.valueOf(UUID.randomUUID()));
-            Map<String, String> cookies = new LinkedHashMap<>();
+            HttpSession session = request.getSession();
+            session.setAttributes("user", user);
 
-            cookies.put("JSESSIONID", session.getId());
-            session.setAttributes("cookie", cookies);
-            httpSession.put(session.getId(), session);
-
-            Object[] keys = cookies.keySet().toArray();
-            for(int i=0; i< keys.length; i++){
-                cookieValue.append(keys[i]);
-                cookieValue.append("=");
-                cookieValue.append(cookies.get(keys[i]));
-
-                if(i < keys.length-1)
-                    cookieValue.append("; ");
-            }
-
-            response.addHeader("Set-Cookie", cookieValue.toString());
             response.sendRedirect("/index.html");
 
         } else {
