@@ -7,10 +7,7 @@ import data.HttpSessions;
 import db.DataBase;
 import model.User;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static data.HttpSessions.httpSession;
 
@@ -29,7 +26,7 @@ public class LoginController extends AbstractController {
 
         if (user.getPassword().equals(request.getParameter("password"))) {
 
-            HttpSession session = new HttpSession();
+            HttpSession session = new HttpSession(String.valueOf(UUID.randomUUID()));
             Map<String, String> cookies = new LinkedHashMap<>();
 
             cookies.put("JESSIONID", session.getId());
