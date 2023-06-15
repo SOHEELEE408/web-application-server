@@ -13,7 +13,7 @@ public class ListUserController extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) throws IOException {
 
-        if(!request.isLogin()) {
+        if(!request.isLogined(request.getSession())) {
             response.forward("/user/login.html");
             return;
         }
