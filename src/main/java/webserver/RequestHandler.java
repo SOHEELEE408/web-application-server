@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
 
 import config.RequestMapping;
 import controller.Controller;
@@ -9,6 +10,7 @@ import data.HttpRequest;
 import data.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HttpRequestUtils;
 
 
 public class RequestHandler extends Thread {
@@ -47,5 +49,11 @@ public class RequestHandler extends Thread {
             return "/index.html";
 
         return path;
+    }
+
+    private String getSessionId(String cookieValue) {
+        Map<String, String> cookies = HttpRequestUtils.parseCookies(cookieValue);
+
+        return cookies.get("JESSIONID");
     }
 }
