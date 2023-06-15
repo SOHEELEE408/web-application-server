@@ -29,7 +29,7 @@ public class LoginController extends AbstractController {
             HttpSession session = new HttpSession(String.valueOf(UUID.randomUUID()));
             Map<String, String> cookies = new LinkedHashMap<>();
 
-            cookies.put("JESSIONID", session.getId());
+            cookies.put("JSESSIONID", session.getId());
             session.setAttributes("cookie", cookies);
             httpSession.put(session.getId(), session);
 
