@@ -76,6 +76,10 @@ public class HttpRequest {
         }
     }
 
+    public HttpCookie getCookies(){
+        return new HttpCookie(getHeader("Cookie"));
+    }
+
     public boolean isLogin(){
         String value = cookie.get("JESSIONID");
 
