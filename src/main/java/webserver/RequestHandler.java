@@ -3,6 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.util.Map;
+import java.util.UUID;
 
 import config.RequestMapping;
 import controller.Controller;
@@ -32,6 +33,9 @@ public class RequestHandler extends Thread {
             HttpResponse response = new HttpResponse(out);
 
             Controller controller = RequestMapping.getController(request.getPath());
+
+            if(getSessionId(request.getHeader("Cookie")) == null)
+                response.addHeader("Set-Cookie", "JESSIONID="+ UUID.randomUUID());
 
             if(controller == null) {
                 String path = getDefaultPath(request.getPath());
