@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import static data.HttpSessions.httpSession;
+
 
 public class HttpRequest {
     private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
@@ -75,11 +77,13 @@ public class HttpRequest {
     }
 
     public boolean isLogin(){
-        String value = cookie.get("logined");
+        String value = cookie.get("JESSIONID");
 
-        if(value == null)
+        HttpSession session = httpSession.get(value);
+
+        if(session == null)
             return false;
 
-        return Boolean.parseBoolean(value);
+        return true;
     }
 }
