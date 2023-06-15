@@ -80,8 +80,12 @@ public class HttpRequest {
         return new HttpCookie(getHeader("Cookie"));
     }
 
+    public HttpSession getSession() {
+        return HttpSessions.getSession(getCookies().getCookie("JSESSIONID"));
+    }
+
     public boolean isLogin(){
-        String value = cookie.get("JESSIONID");
+        String value = cookie.get("JSESSIONID");
 
         HttpSession session = httpSession.get(value);
 
